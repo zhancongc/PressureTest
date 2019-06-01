@@ -1,5 +1,7 @@
 import re
+import os
 import pymongo
+import requests
 
 
 class ZebraOffline(object):
@@ -26,8 +28,23 @@ class ZebraOffline(object):
                 pdf_total_size += size
         print(pdf_total_size)
 
+    def download_book_thumbnail(self):
+        print(os.path.curdir)
+        out = self.db['books'].find({}, {"_id": 0, "Thumbnail": 1})
+        for i in out:
+            if i:
+                print(i)
+                thumbnail_name = i['Thumbnail'].split('/')[-1]
+                try:
+                    r = requests.get(url=i['Thumbnail'])
+                    fp = open('./Thumbnail/' + thumbnail_name, 'wb')
+                    fp.write(r.content)
+                    fp.close()
+                except Exception as e:
+                    print(e)
+
 
 if __name__ == "__main__":
     zebra = ZebraOffline()
-    zebra.calculate_pdf_size()
+    zebra.download_book_thumbnail()
 
